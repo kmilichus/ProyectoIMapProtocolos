@@ -1,9 +1,5 @@
-package Modelo;
+package modelo;
 
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.Properties;
 import javax.mail.BodyPart;
@@ -16,8 +12,8 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
-
-
+import javax.mail.Authenticator;
+import javax.mail.PasswordAuthentication;
 
 public class Cliente {
 
@@ -39,25 +35,28 @@ public class Cliente {
 	}
 	
 	public Properties initPropertiesGmail(){
+		
 		Properties propsG = new Properties();
-		 
+		propsG.put("mail.smtp.starttls.enable", "true"); 
 		propsG.put("mail.smtp.host",smtpHostG);
+		propsG.put("mail.smtp.port", "587");
 		propsG.put("mail.transport.protocol","smtp");
-		propsG.put("mail.smtp.auth", "true");
-		propsG.setProperty("mail.user", user);
-		propsG.setProperty("mail.password", password);
+		propsG.put("mail.user", user);
+		propsG.put("mail.password", password);
+		propsG.setProperty("mail.smtp.auth", "true");
 		
 		return propsG;
 	}
 	
 	public Properties initPropertiesHotmail(){
 		Properties propsH = new Properties();
-		 
+		
+		propsH.put("mail.smtp.starttls.enable", "true"); 
 		propsH.put("mail.smtp.host",smtpHostH);
 		propsH.put("mail.transport.protocol","smtp");
 		propsH.put("mail.smtp.auth", "true");
-		propsH.setProperty("mail.user", user);
-		propsH.setProperty("mail.password", password);
+		propsH.put("mail.user", user);
+		propsH.put("mail.password", password);
 		
 		return propsH;
 	}
@@ -67,11 +66,19 @@ public class Cliente {
 			Session sesion = null;
 			if (user.contains("gmail")){
 				
-				sesion = Session.getInstance(initPropertiesGmail(),null);
+				sesion = Session.getDefaultInstance(initPropertiesGmail(), new javax.mail.Authenticator() {
+				    protected PasswordAuthentication getPasswordAuthentication() {
+				        return new PasswordAuthentication(user, password);
+				    }
+				});
+				
+				sesion.setDebug(false);
+															
+			//	sesion = Session.getDefaultInstance(initPropertiesGmail(),null);
 				
 			}else if (user.contains("hotmail")){
 				
-				sesion = sesion.getInstance(initPropertiesHotmail(),null);
+				sesion = sesion.getDefaultInstance(initPropertiesHotmail(),null);
 			}
 			
 			Message mensaje = new MimeMessage(sesion);
@@ -79,6 +86,7 @@ public class Cliente {
 		
 		//Completa atributos 
 		
+
 		//Asunto
 		mensaje.setSubject(asunto);
 		
@@ -109,10 +117,11 @@ public class Cliente {
 		mensaje.setText(cuerpo);
 		
 		}
+	
 		
 		//Envio del mensaje
-		Transport.send(mensaje);
-		
+		Transport.send(mensaje);		
+		System.out.println("Mensaje Enviado Correctamente");
 		}catch(MessagingException e){
 		System.err.println(e.getMessage());
 		}catch (IOException ioe){
@@ -120,6 +129,8 @@ public class Cliente {
 		}	
 		
 	}
+	   
+
 	
 	public void setUser(String user) {
 		this.user = user;
@@ -138,3 +149,4 @@ public class Cliente {
 	}
 
 }
+
