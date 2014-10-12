@@ -75,7 +75,7 @@ public class Cliente {
 		//Receptor
 		mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(receptor));
 		
-		if (adjunto != null){
+		if (ruta != null){
 		
 		//Adjunto
 		Multipart mp= new MimeMultipart();
