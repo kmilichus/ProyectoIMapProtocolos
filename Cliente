@@ -1,3 +1,5 @@
+
+
 package modelo;
 
 import java.io.IOException;
@@ -49,14 +51,17 @@ public class Cliente {
 	}
 	
 	public Properties initPropertiesHotmail(){
-		Properties propsH = new Properties();
 		
-		propsH.put("mail.smtp.starttls.enable", "true"); 
-		propsH.put("mail.smtp.host",smtpHostH);
+		Properties propsH = new Properties();
+
 		propsH.put("mail.transport.protocol","smtp");
-		propsH.put("mail.smtp.auth", "true");
-		propsH.put("mail.user", user);
+		propsH.put("mail.smtp.host",smtpHostH);
 		propsH.put("mail.password", password);
+		propsH.put("mail.smtp.auth", "true");
+		propsH.put("mail.smtp.port", "587");
+		propsH.setProperty("mail.smtp.quitwait", "false");
+		propsH.put("mail.smtp.starttls.enable", "true"); 
+	
 		
 		return propsH;
 	}
@@ -66,19 +71,24 @@ public class Cliente {
 			Session sesion = null;
 			if (user.contains("gmail")){
 				
-				sesion = Session.getDefaultInstance(initPropertiesGmail(), new javax.mail.Authenticator() {
+				sesion = Session.getInstance(initPropertiesGmail(), new javax.mail.Authenticator() {
+				    protected PasswordAuthentication getPasswordAuthentication() {
+				        return new PasswordAuthentication(user, password);
+				    }
+				});
+				
+				sesion.setDebug(true);
+															
+				
+			}else if (user.contains("hotmail")){
+				
+				sesion = Session.getDefaultInstance(initPropertiesHotmail(), new javax.mail.Authenticator() {
 				    protected PasswordAuthentication getPasswordAuthentication() {
 				        return new PasswordAuthentication(user, password);
 				    }
 				});
 				
 				sesion.setDebug(false);
-															
-			//	sesion = Session.getDefaultInstance(initPropertiesGmail(),null);
-				
-			}else if (user.contains("hotmail")){
-				
-				sesion = sesion.getDefaultInstance(initPropertiesHotmail(),null);
 			}
 			
 			Message mensaje = new MimeMessage(sesion);
@@ -121,7 +131,9 @@ public class Cliente {
 		
 		//Envio del mensaje
 		Transport.send(mensaje);		
-		System.out.println("Mensaje Enviado Correctamente");
+		
+		System.out.println(" El Mensaje fue enviado Correctamente");
+		
 		}catch(MessagingException e){
 		System.err.println(e.getMessage());
 		}catch (IOException ioe){
@@ -149,4 +161,3 @@ public class Cliente {
 	}
 
 }
-
