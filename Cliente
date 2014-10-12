@@ -49,7 +49,7 @@ public class Cliente {
 		return propsH;
 	}
 	
-	public void enviarCorreo(String asunto, String cuerpo, String receptor){
+	public void enviarCorreo(String asunto, String cuerpo, String receptor, String ruta){
 	
 			Session sesion = null;
 			if (user.contains("gmail")){
@@ -75,15 +75,36 @@ public class Cliente {
 		//Receptor
 		mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(receptor));
 		
+		if (adjunto != null){
+		
+		//Adjunto
+		Multipart mp= new MimeMultipart();
+		BodyPart texto= new MimeBodyPart();
+		texto.setText(cuerpo); //Cuerpo del Mensaje
+		mp.addBodyPart(texto);
+		
+		MimeBodyPart adj1= new MimeBodyPart();
+		adj1.attachFile(ruta); //Se le pasa la ruta del archivo txt adjunto
+		mp.addBodyPart(adj1);
+		
+		//Junta el mensaje con el Cuerpo y el Adjunto
+		mensaje.setContent(mp); 
+		
+		}else {
+		
 		//Cuerpo del Mensaje
 		mensaje.setText(cuerpo);
+		
+		}
 		
 		//Envio del mensaje
 		Transport.send(mensaje);
 		
 		}catch(MessagingException e){
 		System.err.println(e.getMessage());
-		}
+		}catch (IOException ioe){
+		System.out.println(ioe.toString());
+		}	
 		
 	}
 	
