@@ -49,7 +49,7 @@ public class Cliente {
 		return propsH;
 	}
 	
-	public void enviarCorreo(){
+	public void enviarCorreo(String asunto, String cuerpo, String receptor){
 	
 			Session sesion = null;
 			if (user.contains("gmail")){
@@ -62,7 +62,29 @@ public class Cliente {
 			}
 			
 			Message mensaje = new MimeMessage(sesion);
-			
+		try {
+		
+		//Completa atributos 
+		
+		//Asunto
+		mensaje.setSubject(asunto);
+		
+		//Emisor
+		mensaje.setFrom(new InternetAddress(user));
+		
+		//Receptor
+		mensaje.addRecipient(Message.RecipientType.TO, new InternetAddress(receptor));
+		
+		//Cuerpo del Mensaje
+		mensaje.setText(cuerpo);
+		
+		//Envio del mensaje
+		Transport.send(mensaje);
+		
+		}catch(MessagingException e){
+		System.err.println(e.getMessage());
+		}
+		
 	}
 	
 	public void setUser(String user) {
@@ -81,7 +103,4 @@ public class Cliente {
 		return password;
 	}
 
-	
-	
-	
 }
